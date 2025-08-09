@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/sajilni   # <-- service name, not localhost
+    username: postgres
+    password: AhmadSajidSura2003
+  redis:
+    host: redis                                    # <-- service name
+    port: 6379
+  mail:
+    host: mailhog                                  # <-- service name
+    port: 1025
+  app:
+    otp:
+      length: 6
+      ttl-minutes: 30
+      type: NUMERIC
+    jwt:
+
+      secret: "6513304bfbecff49289dee08cf1b79163ed2641923144dd3545966ed66c9014ba5db3445a10979682808b50897310d26587a64fb37a85bc51c30f00d9dcf004d"
+      expirationMs: 30m    # 30 minutes
+      issuer: "sajilni-clone"
+
+  server:
+    port: 8080

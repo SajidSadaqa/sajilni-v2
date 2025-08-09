@@ -1,0 +1,48 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: sajilni
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: AhmadSajidSura2003
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U postgres -d sajilni"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD","redis-cli","ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports: ["1025:1025", "8025:8025"]
+
+  sajilni-app:
+    build: .
+    ports: ["8080:8080"]
+    environment:
+      # Activate docker profile so app uses service names (see application-docker.yml)
+      SPRING_PROFILES_ACTIVE: docker
+      # (Optional) override secrets via env:
+      # APP_JWT_SECRET: "super-long-random-512-bit-secret"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+
+volumes:
+  pgdata:
