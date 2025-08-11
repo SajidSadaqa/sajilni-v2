@@ -1,11 +1,12 @@
 package com.sajilni.repository;
 
-import com.sajilni.entity.User;
+import com.sajilni.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-
-public interface UserRepository extends JpaRepository<User, Long> {
+@Repository
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByEmail(String email);
-    Optional<User> findByEmail(String email);
+    Optional<UserEntity> findByEmail(String email);
 }

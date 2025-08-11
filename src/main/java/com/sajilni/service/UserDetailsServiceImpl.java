@@ -1,6 +1,6 @@
 package com.sajilni.service;
 
-import com.sajilni.entity.User;
+import com.sajilni.entity.UserEntity;
 import com.sajilni.repository.UserRepository;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
@@ -15,12 +15,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = users.findByEmail(email.toLowerCase())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        boolean enabled = user.isEnabled();
+        UserEntity userEntity = users.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new UsernameNotFoundException("UserEntity not found"));
+        boolean enabled = userEntity.isEnabled();
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPasswordHash())
+                .withUsername(userEntity.getEmail())
+                .password(userEntity.getPasswordHash())
                 .accountExpired(false)
                 .accountLocked(false)
                 .credentialsExpired(false)

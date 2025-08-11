@@ -1,6 +1,8 @@
 package com.sajilni.repository;
 
-import com.sajilni.entity.DeviceInfo;
+import com.sajilni.entity.DeviceInfoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface DeviceInfoRepository extends JpaRepository<DeviceInfo, Long> {}
+@Repository
+public interface DeviceInfoRepository extends JpaRepository<DeviceInfoEntity, Long> {}

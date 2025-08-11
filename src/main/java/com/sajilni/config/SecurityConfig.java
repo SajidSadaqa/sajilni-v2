@@ -27,10 +27,10 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthenticationEntryPoint entryPoint,
                           JwtAuthenticationFilter jwtFilter,
                           UserDetailsServiceImpl userDetails) {
-                this.entryPoint = entryPoint;
-                this.jwtFilter = jwtFilter;
-                this.userDetails = userDetails;
-            }
+        this.entryPoint = entryPoint;
+        this.jwtFilter = jwtFilter;
+        this.userDetails = userDetails;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -50,24 +50,31 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .exceptionHandling(eh -> eh.authenticationEntryPoint(entryPoint))
                 .authorizeHttpRequests(auth -> auth
-                        // CORS preflight
+                        // TODO: This is the best practice approach - using .permitAll() instead of manual filtering
+                        // CORS preflight requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Swagger & health
+
+                        // Documentation endpoints
                         .requestMatchers(
-                        "/swagger-ui.html",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/v3/api-docs.yaml",
-                        "/swagger-resources/**",
-                        "/webjars/**",
-                        "/actuator/health",
-                        "/error"
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-resources/**",
+                                "/webjars/**"
                         ).permitAll()
+
+                        // Health and error endpoints
+                        .requestMatchers("/actuator/health", "/error").permitAll()
+
+                        // Authentication endpoints - POST only for security
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        // All other requests require authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -79,10 +86,15 @@ public class SecurityConfig {
         return provider;
     }
 
-    // Dev CORS: open up to Swagger UI at http://localhost:8080 (same origin) and your React app (adjust origins)
-   @Bean
-   public CorsConfigurationSource corsConfigurationSource() {
+    /**
+     * TODO: For production, replace with specific origins
+     * Current config is suitable for development
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
+        // TODO: In production, replace with specific origins like:
+        // cfg.setAllowedOrigins(Arrays.asList("https://yourfrontend.com"));
         cfg.addAllowedOriginPattern("*"); // for dev; restrict in prod
         cfg.addAllowedHeader("*");
         cfg.addAllowedMethod("*");
@@ -90,5 +102,5 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;
-   }
+    }
 }

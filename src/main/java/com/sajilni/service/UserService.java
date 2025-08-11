@@ -1,8 +1,8 @@
 package com.sajilni.service;
 
 import com.sajilni.dto.RegisterDto;
-import com.sajilni.entity.DeviceInfo;
-import com.sajilni.entity.User;
+import com.sajilni.entity.DeviceInfoEntity;
+import com.sajilni.entity.UserEntity;
 import com.sajilni.repository.DeviceInfoRepository;
 import com.sajilni.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,45 +23,45 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(RegisterDto dto) {
+    public UserEntity createUser(RegisterDto dto) {
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             throw new IllegalArgumentException("Passwords do not match");
         }
         if (users.existsByEmail(dto.getEmail())) {
             throw new IllegalStateException("user.exists");
         }
-        User u = new User();
+        UserEntity u = new UserEntity();
                 u.setFirstName(dto.getFirstName());
                 u.setLastName(dto.getLastName());
                 u.setEmail(dto.getEmail().toLowerCase());
                 u.setPasswordHash(encoder.encode(dto.getPassword()));
                 u.setEnabled(false);
-        users.save(u);
+        //users.save(u);
 
         if (dto.getPlatform() != null || dto.getModel() != null || dto.getOsName() != null) {
-                        DeviceInfo d = new DeviceInfo();
-                        d.setUser(u);
+                        DeviceInfoEntity d = new DeviceInfoEntity();
+                        d.setUserEntity(u);
                         d.setPlatform(dto.getPlatform());
                         d.setSerialNumber(dto.getSerialNumber());
                         d.setModel(dto.getModel());
                         d.setOsName(dto.getOsName());
                         d.setOsVersion(dto.getOsVersion());
                         d.setClientTimestamp(dto.getClientTimestamp());
-            devices.save(d);
+            //devices.save(d);
         }
         return u;
     }
 
     public void enableUser(String email) {
-        User u = users.findByEmail(email.toLowerCase()).orElseThrow();
+        UserEntity u = users.findByEmail(email.toLowerCase()).orElseThrow();
         if (!u.isEnabled()) {
             u.setEnabled(true);
             users.save(u);
         }
     }
 
-    public User findByEmailOrThrow(String email) {
+    public UserEntity findByEmailOrThrow(String email) {
             return users.findByEmail(email.toLowerCase())
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                        .orElseThrow(() -> new UsernameNotFoundException("UserEntity not found"));
           }
 }

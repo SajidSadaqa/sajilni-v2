@@ -30,9 +30,24 @@ app:
     type: NUMERIC
   jwt:
 
-    secret: "6513304bfbecff49289dee08cf1b79163ed2641923144dd3545966ed66c9014ba5db3445a10979682808b50897310d26587a64fb37a85bc51c30f00d9dcf004d"
+    secret: "6513304bfbecff49289dee08cf1b79163ed2641923144dd3545966ed66c9014ba5db3445a10979682808b50897310d26587a64fb37a85bc51c30f00d9dcf004d" #Certificate
     expirationMs: 30m    # 30 minutes
-    issuer: "sajilni-clone"
+    issuer: "127.0.0.1" # Localhost
 
-server:
-  port: 8080
+  server:
+    port: 8080
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: notifciation.twinscode@gmail.com
+    password: jdlv jzff jwqs kjur
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            protocols: TLSv1.2
+          starttls:
+            enable: false
+            required: false
