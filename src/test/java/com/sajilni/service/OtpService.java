@@ -1,7 +1,7 @@
 package com.sajilni.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sajilni.domain.constants.Type;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -11,12 +11,10 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// Todo : put otp table in database
+@Slf4j
 @Service
 public class OtpService {
-    private static final Logger log = LoggerFactory.getLogger(OtpService.class);
-
-    public enum Type {NUMERIC, ALPHA, ALPHANUMERIC}
-
     // In-memory storage for OTP codes
     private final ConcurrentHashMap<String, OtpData> otpStorage = new ConcurrentHashMap<>();
 
@@ -50,6 +48,8 @@ public class OtpService {
     /**
      * Verify OTP and remove it if valid
      */
+
+    // we should use challenge here
     public boolean verify(String email, String otp) {
         String key = key(email);
         OtpData otpData = otpStorage.get(key);

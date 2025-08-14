@@ -1,5 +1,6 @@
 package com.sajilni.service;
 
+import com.sajilni.domain.request.RegisterReq;
 import com.sajilni.dto.*;
 import com.sajilni.entity.UserEntity;
 import org.springframework.context.MessageSource;
@@ -25,21 +26,27 @@ public class AuthFacade {
         this.messages = messages;
     }
 
-    public ResponseEntity<String> register(RegisterDto dto, Locale locale) {
-        UserEntity userEntity = userService.createUser(dto);
+    public ResponseEntity<?> register(RegisterReq registerReq, Locale locale) {
+        UserEntity userEntity = userService.createUser(registerReq);
         String code = otpService.genrate(userEntity.getEmail());
         mailService.sendOtp(userEntity.getEmail(), code);
         String msg = messages.getMessage("user.registered", null, locale);
         return ResponseEntity.status(201).body(msg);
     }
 
-    public ResponseEntity<String> verifyOtp(VerifyOtpDto dto, Locale locale) {
+    public ResponseEntity<?> verifyOtp(VerifyOtpDto dto, Locale locale) {
         boolean ok = otpService.verify(dto.getEmail(), dto.getOtp());
         if (!ok) {
             String msg = messages.getMessage("otp.invalid", null, locale);
             return ResponseEntity.badRequest().body(msg);
         }
-        userService.enableUser(dto.getEmail());
+
+        // Enable user and get user details for welcome email
+        UserEntity user = userService.enableUser(dto.getEmail());
+
+        // Send welcome email after successful verification
+        mailService.sendWelcomeEmail(user.getEmail(), user.getFirstName());
+
         String msg = messages.getMessage("otp.verified", null, locale);
         return ResponseEntity.ok(msg);
     }
