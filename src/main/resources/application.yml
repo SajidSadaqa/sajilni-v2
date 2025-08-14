@@ -1,18 +1,20 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/sajilni   # if Spring runs on host
+    url: jdbc:postgresql://localhost:5432/sajilni
     username: postgres
     password: AhmadSajidSura2003
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
       connection-timeout: 30000
+      leak-detection-threshold: 60000
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate # Changed from update to validate for production safety
     properties:
       hibernate.jdbc.time_zone: UTC
-      hibernate.format_sql: true
+      hibernate.format_sql: false # Disable in production
+      hibernate.show_sql: false # Disable in production
     open-in-view: false
   mail:
     host: localhost
@@ -22,36 +24,63 @@ spring:
   redis:
     host: localhost
     port: 6379
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
 
 app:
   otp:
     length: 6
     ttl-minutes: 30
     type: NUMERIC
+    max-attempts: 5
+    generation-limit-per-hour: 3
+    lockout-minutes: 15
+  jwt:
+    issuer: "sajilni-auth-service"
+    expirationMs: 30m
+    refreshExpirationMs: 7d
+    private-key-path: "classpath:certs/private_key.pem"
+    public-key-path: "classpath:certs/public_key.pem"
+    generate-keys-if-missing: true
+  security:
+    rate-limit:
+      login-attempts: 5
+      lockout-duration: 15m
+      window-size: 1h
+  mail:
     name: "Sajilni"
     website: "https://sajilni.com"
     support:
-        email: "support@sajilni.com"
-  jwt:
+      email: "support@sajilni.com"
 
-    secret: "6513304bfbecff49289dee08cf1b79163ed2641923144dd3545966ed66c9014ba5db3445a10979682808b50897310d26587a64fb37a85bc51c30f00d9dcf004d" #Certificate
-    expirationMs: 30m    # 30 minutes
-    issuer: "127.0.0.1" # Localhost
+server:
+  port: 8080
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
 
-  server:
-    port: 8080
-  mail:
-    host: smtp.gmail.com
-    port: 465
-    username: notifciation.twinscode@gmail.com
-    password: jdlv jzff jwqs kjur
-    properties:
-      mail:
-        smtp:
-          auth: true
-          ssl:
-            enable: true
-            protocols: TLSv1.2
-          starttls:
-            enable: false
-            required: false
+logging:
+  level:
+    com.sajilni: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr([%thread]){magenta} %clr(%-5level){highlight} %clr(%logger{36}){cyan} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  

@@ -1,21 +1,32 @@
 package com.sajilni.config;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
 
 @Component
 @ConfigurationProperties(prefix = "app.jwt")
+@Validated
+@NoArgsConstructor
+@AllArgsConstructor
 public class JwtConfig {
-    private String secret;
-    private java.time.Duration expirationMs;
+
+    @NotBlank(message = "JWT issuer is required")
     private String issuer;
 
-    public String getSecret() { return secret; }
-    public void setSecret(String secret) { this.secret = secret; }
+    @NotNull(message = "JWT expiration duration is required")
+    private Duration expirationMs = Duration.ofMinutes(30);
 
-    public java.time.Duration getExpirationMs() { return expirationMs; }
-    public void setExpirationMs(java.time.Duration expirationMs) { this.expirationMs = expirationMs; }
+    @NotNull(message = "JWT refresh expiration duration is required")
+    private Duration refreshExpirationMs = Duration.ofDays(7);
 
-    public String getIssuer() { return issuer; }
-    public void setIssuer(String issuer) { this.issuer = issuer; }
+    private String privateKeyPath = "classpath:certs/private_key.pem";
+    private String publicKeyPath = "classpath:certs/public_key.pem";
+    private boolean generateKeysIfMissing = true;
 }
