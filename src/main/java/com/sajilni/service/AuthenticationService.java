@@ -19,13 +19,13 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final MessageSource messages;
 
-    public AuthenticationService(AuthenticationManager authManager, UserService userService,
-                                 JwtService jwtService, MessageSource messages) {
+    public AuthenticationService(AuthenticationManager authManager, UserService userService, JwtService jwtService, MessageSource messages) {
         this.authManager = authManager;
         this.userService = userService;
         this.jwtService = jwtService;
         this.messages = messages;
     }
+
 
     public ResponseEntity<?> authenticate(LoginDto dto, Locale locale) {
         try {
