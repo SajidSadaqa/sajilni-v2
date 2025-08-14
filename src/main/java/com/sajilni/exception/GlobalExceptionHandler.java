@@ -1,5 +1,6 @@
 package com.sajilni.exception;
 
+import com.sajilni.api.ApiError;
 import com.sajilni.domain.response.ErrorResponse;
 import com.sajilni.domain.response.ValidationErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
