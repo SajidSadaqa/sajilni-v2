@@ -41,16 +41,17 @@ app:
     lockout-minutes: 15
   jwt:
     issuer: "sajilni-auth-service"
+    secret: "19d68cb553c0bb5c049d3022bad2bbfe75f86d931928c2b4e0f2058db5dda7fcc8f79de369493cc73c2a69b59e94bdb46a522f3a04a7d6f857f4a94c699935dd"
     expirationMs: 30m
     refreshExpirationMs: 7d
-    private-key-path: "classpath:certs/private_key.pem"
-    public-key-path: "classpath:certs/public_key.pem"
     generate-keys-if-missing: true
   security:
     rate-limit:
       login-attempts: 5
       lockout-duration: 15m
       window-size: 1h
+    private-key-path: "classpath:certs/private_key.pem"
+    public-key-path: "classpath:certs/public_key.pem"
   mail:
     name: "Sajilni"
     website: "https://sajilni.com"

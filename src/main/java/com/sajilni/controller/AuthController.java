@@ -1,5 +1,6 @@
 package com.sajilni.controller;
 
+import com.sajilni.domain.request.OtpRequest;
 import com.sajilni.domain.request.RegisterReq;
 import com.sajilni.domain.response.*;
 import com.sajilni.dto.*;
@@ -146,7 +147,7 @@ public class AuthController {
             )
     })
     public ResponseEntity<com.sajilni.domain.response.ApiResponse<OtpResponse>> requestNewOtp(
-            @Valid @RequestBody RequestOtpDto dto,
+            @Valid @RequestBody OtpRequest dto,
             @Parameter(hidden = true) @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage) {
 
         log.info("New OTP requested for email: {}", dto.getEmail());
