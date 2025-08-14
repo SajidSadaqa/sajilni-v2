@@ -1,4 +1,4 @@
-package com.sajilni.dto;
+package com.sajilni.domain.response;
 
 import lombok.Builder;
 import lombok.Data;

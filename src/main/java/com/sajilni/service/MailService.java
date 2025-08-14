@@ -9,6 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -59,6 +61,17 @@ public class MailService {
         }
     }
 
+    @Async
+    public CompletableFuture<Void> sendOtpAsync(String to, String otp, String firstName) {
+        try {
+            sendOtp(to, otp);
+            return CompletableFuture.completedFuture(null);
+        } catch (Exception ex) {
+            log.error("Async OTP email sending failed for {}", to, ex);
+            return CompletableFuture.failedFuture(ex);
+        }
+    }
+
     public void sendWelcomeEmail(String to, String firstName) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -76,6 +89,17 @@ public class MailService {
 
         } catch (Exception ex) {
             log.error("Failed to send welcome email to {}", to, ex);
+        }
+    }
+
+    @Async
+    public CompletableFuture<Void> sendWelcomeEmailAsync(String to, String firstName) {
+        try {
+            sendWelcomeEmail(to, firstName);
+            return CompletableFuture.completedFuture(null);
+        } catch (Exception ex) {
+            log.error("Async welcome email sending failed for {}", to, ex);
+            return CompletableFuture.failedFuture(ex);
         }
     }
 

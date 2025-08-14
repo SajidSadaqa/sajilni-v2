@@ -1,7 +1,6 @@
 package com.sajilni.service;
 
 import com.sajilni.domain.request.RegisterReq;
-import com.sajilni.dto.RegisterDto;
 import com.sajilni.entity.DeviceInfoEntity;
 import com.sajilni.entity.UserEntity;
 import com.sajilni.repository.DeviceInfoRepository;

@@ -1,6 +1,7 @@
 package com.sajilni.controller;
 
 import com.sajilni.domain.request.RegisterReq;
+import com.sajilni.domain.response.*;
 import com.sajilni.dto.*;
 import com.sajilni.service.AuthFacade;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +50,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
-    public ResponseEntity<com.sajilni.dto.ApiResponse<RegisterResponse>> register(
+    public ResponseEntity<com.sajilni.domain.response.ApiResponse<RegisterResponse>> register(
             @Valid @RequestBody RegisterReq registerReq,
             @Parameter(hidden = true) @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage) {
 
@@ -79,7 +80,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
-    public ResponseEntity<com.sajilni.dto.ApiResponse<OtpVerificationResponse>> verifyOtp(
+    public ResponseEntity<com.sajilni.domain.response.ApiResponse<OtpVerificationResponse>> verifyOtp(
             @Valid @RequestBody VerifyOtpDto dto,
             @Parameter(hidden = true) @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage) {
 
@@ -114,7 +115,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
-    public ResponseEntity<com.sajilni.dto.ApiResponse<LoginResponse>> login(
+    public ResponseEntity<com.sajilni.domain.response.ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginDto dto,
             @Parameter(hidden = true) @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage) {
 
@@ -144,7 +145,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
-    public ResponseEntity<com.sajilni.dto.ApiResponse<OtpResponse>> requestNewOtp(
+    public ResponseEntity<com.sajilni.domain.response.ApiResponse<OtpResponse>> requestNewOtp(
             @Valid @RequestBody RequestOtpDto dto,
             @Parameter(hidden = true) @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage) {
 
@@ -169,7 +170,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
-    public ResponseEntity<com.sajilni.dto.ApiResponse<TokenResponse>> refreshToken(
+    public ResponseEntity<com.sajilni.domain.response.ApiResponse<TokenResponse>> refreshToken(
             @Valid @RequestBody RefreshTokenDto dto,
             @Parameter(hidden = true) @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage) {
 
@@ -186,10 +187,10 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Logout successful",
-                    content = @Content(schema = @Schema(implementation = com.sajilni.dto.ApiResponse.class))
+                    content = @Content(schema = @Schema(implementation = com.sajilni.domain.response.ApiResponse.class))
             )
     })
-    public ResponseEntity<com.sajilni.dto.ApiResponse<Void>> logout(
+    public ResponseEntity<com.sajilni.domain.response.ApiResponse<Void>> logout(
             @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         // In a stateless JWT system, logout is primarily handled client-side
@@ -198,7 +199,7 @@ public class AuthController {
 
         log.info("User logout requested");
 
-        return ResponseEntity.ok(com.sajilni.dto.ApiResponse.<Void>builder()
+        return ResponseEntity.ok(com.sajilni.domain.response.ApiResponse.<Void>builder()
                 .success(true)
                 .message("Logout successful")
                 .build());

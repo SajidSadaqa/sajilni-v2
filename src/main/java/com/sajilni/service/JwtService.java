@@ -9,11 +9,13 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
+import java.time.Duration;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Date;
+import java.util.Map;
 
 @Service
 public class JwtService {
@@ -31,16 +33,38 @@ public class JwtService {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String email, Long userId) {
+    public String generateToken(String email, Long userId, Map<String, Object> claims) {
         Instant now = Instant.now();
         Instant expiry = now.plus(jwtConfig.getExpirationMs());
-        return Jwts.builder()
-                .subject(email)
-                .claim("userId", userId)
-                .issuedAt(Date.from(now))
-                .expiration(Date.from(expiry))
-                .signWith(key)
-                .compact();
+        Map<String, Object> payload = new HashMap<>();
+                if (claims != null) payload.putAll(claims);
+                payload.put("userId", userId);
+                payload.put("tokenType", "access"); // distinguish from refresh
+
+                        return Jwts.builder()
+                                .issuer(jwtConfig.getIssuer())
+                                .subject(email)
+                                .claims(payload)
+                                .issuedAt(Date.from(now))
+                                .expiration(Date.from(expiry))
+                                .signWith(key)
+                                .compact();
+    }
+
+    /** Create a long-lived refresh token (no custom claims needed). */
+    public String generateRefreshToken(String email, Long userId) {
+                Instant now = Instant.now();
+                Instant expiry = now.plus(jwtConfig.getRefreshExpirationMs());
+
+                        return Jwts.builder()
+                                .issuer(jwtConfig.getIssuer())
+                                .subject(email)
+                                .claim("userId", userId)
+                                .claim("tokenType", "refresh")
+                                .issuedAt(Date.from(now))
+                                .expiration(Date.from(expiry))
+                                .signWith(key)
+                                .compact();
     }
 
     public String getEmailFromToken(String token) {
@@ -71,6 +95,26 @@ public class JwtService {
         }
     }
 
+    /** True iff the token has "tokenType":"refresh". */
+    public boolean isRefreshToken(String token) {
+                try {
+                        String type = getClaims(token).get("tokenType", String.class);
+                        return "refresh".equals(type);
+                    } catch (Exception e) {
+                        return false;
+                    }
+            }
+
+            /** Optional: check access type explicitly. */
+            public boolean isAccessToken(String token) {
+                try {
+                        String type = getClaims(token).get("tokenType", String.class);
+                        return "access".equals(type);
+                    } catch (Exception e) {
+                        return false;
+                    }
+            }
+
     public Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)
@@ -79,4 +123,14 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+        /** Access token lifetime (used by AuthenticationService.expiresIn). */
+                public Duration getTokenExpiration() {
+                return jwtConfig.getExpirationMs();
+            }
+
+            /** Refresh token lifetime (handy if you need to expose it). */
+            public Duration getRefreshTokenExpiration() {
+                return jwtConfig.getRefreshExpirationMs();
+            }
 }

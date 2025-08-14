@@ -1,6 +1,8 @@
 package com.sajilni.service;
 
+import com.sajilni.domain.request.OtpRequest;
 import com.sajilni.domain.request.RegisterReq;
+import com.sajilni.domain.response.*;
 import com.sajilni.dto.*;
 import com.sajilni.entity.UserEntity;
 import com.sajilni.exception.BusinessException;
@@ -12,9 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -144,7 +144,7 @@ public class AuthFacade {
         }
     }
 
-    public ResponseEntity<ApiResponse<OtpResponse>> requestNewOtp(RequestOtpDto dto) {
+    public ResponseEntity<ApiResponse<OtpResponse>> requestNewOtp(OtpRequest dto) {
         Locale locale = LocaleContextHolder.getLocale();
 
         try {

@@ -1,7 +1,9 @@
 package com.sajilni.config;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -13,12 +15,17 @@ import java.time.Duration;
 @Component
 @ConfigurationProperties(prefix = "app.jwt")
 @Validated
-@NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class JwtConfig {
 
     @NotBlank(message = "JWT issuer is required")
     private String issuer;
+
+    @NotBlank(message = "JWT secret is required")
+    private String secret;
 
     @NotNull(message = "JWT expiration duration is required")
     private Duration expirationMs = Duration.ofMinutes(30);
