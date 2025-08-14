@@ -50,8 +50,8 @@ app:
       login-attempts: 5
       lockout-duration: 15m
       window-size: 1h
-    private-key-path: "classpath:certs/private_key.pem"
-    public-key-path: "classpath:certs/public_key.pem"
+    private-key-path: "certs/private_key.pem"
+    public-key-path: "certs/public_key.pem"
   mail:
     name: "Sajilni"
     website: "https://sajilni.com"

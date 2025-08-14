@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(value = "/api/auth", produces = "application/json;charset=UTF-8")
 @Tag(name = "Authentication", description = "User authentication and registration endpoints")
 public class AuthController {
 
