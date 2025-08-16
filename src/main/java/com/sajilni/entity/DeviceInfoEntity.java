@@ -36,7 +36,7 @@ public class DeviceInfoEntity {
     @Column(length = 64)
     private String osVersion;       // OS version
 
-    @Column(length = 64)
+    @Column(name = "client_timestamp", nullable = false, columnDefinition = "TIMESTAMPTZ")
     private String clientTimestamp; // optional raw timestamp string from client
 
 

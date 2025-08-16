@@ -1,26 +1,67 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/sajilni
-    username: postgres
-    password: AhmadSajidSura2003
+    url: jdbc:postgresql://localhost:5432/sajilni?useUnicode=true&characterEncoding=UTF-8&stringtype=unspecified
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:AhmadSajidSura2003}
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
       connection-timeout: 30000
       leak-detection-threshold: 60000
+      # Add UTF-8 connection properties
   jpa:
     hibernate:
-      ddl-auto: validate # Changed from update to validate for production safety
+      ddl-auto: validate
     properties:
       hibernate.jdbc.time_zone: UTC
-      hibernate.format_sql: false # Disable in production
-      hibernate.show_sql: false # Disable in production
+      hibernate.format_sql: false
+      hibernate.show_sql: false
+      # PostgreSQL UTF-8 configuration
+      hibernate.connection.characterEncoding: UTF-8
+      hibernate.connection.useUnicode: true
+      hibernate.connection.charSet: UTF-8
     open-in-view: false
+
+  # HTTP Encoding Configuration
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+      force-request: true
+      force-response: true
+
+  # Message source encoding
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+  # Jackson configuration for JSON
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: NON_NULL
+    http:
+      converters:
+        preferred-json-mapper: jackson
+
+  # Mail Configuration
   mail:
-    host: localhost
-    port: 1025
-    properties.mail.smtp.auth: false
-    properties.mail.smtp.starttls.enable: false
+    host: ${EMAIL_SMTP_URL:localhost}
+    port: ${EMAIL_SMTP_PORT:1025}
+    username: ${EMAIL_USERNAME:}
+    password: ${EMAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${EMAIL_SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${EMAIL_SMTP_STARTTLS:false}
+      mail.smtp.ssl.enable: ${EMAIL_SMTP_SSL:false}
+      mail.smtp.ssl.trust: smtp.gmail.com
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
+
+  # Redis Configuration
   redis:
     host: localhost
     port: 6379
@@ -31,6 +72,28 @@ spring:
         max-idle: 8
         min-idle: 0
 
+  # Allow bean definition overriding
+  main:
+    allow-bean-definition-overriding: true
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+      force-request: true
+      force-response: true
+  # Temporarily show errors for debugging
+  error:
+    include-message: always
+    include-binding-errors: on_param
+    include-stacktrace: on_param
+    include-exception: true
+
+# Application Configuration
 app:
   otp:
     length: 6
@@ -39,12 +102,14 @@ app:
     max-attempts: 5
     generation-limit-per-hour: 3
     lockout-minutes: 15
+
   jwt:
     issuer: "sajilni-auth-service"
     secret: "19d68cb553c0bb5c049d3022bad2bbfe75f86d931928c2b4e0f2058db5dda7fcc8f79de369493cc73c2a69b59e94bdb46a522f3a04a7d6f857f4a94c699935dd"
     expirationMs: 30m
     refreshExpirationMs: 7d
     generate-keys-if-missing: true
+
   security:
     rate-limit:
       login-attempts: 5
@@ -52,30 +117,27 @@ app:
       window-size: 1h
     private-key-path: "certs/private_key.pem"
     public-key-path: "certs/public_key.pem"
+
   mail:
     name: "Sajilni"
     website: "https://sajilni.com"
     support:
       email: "support@sajilni.com"
 
-server:
-  port: 8080
-  error:
-    include-message: never
-    include-binding-errors: never
-    include-stacktrace: never
-    include-exception: false
-
+# Logging Configuration
 logging:
   level:
     com.sajilni: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    # Add encoding related logging
+    org.springframework.web.servlet.mvc.method.annotation: DEBUG
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr([%thread]){magenta} %clr(%-5level){highlight} %clr(%logger{36}){cyan} - %msg%n"
 
+# Management endpoints
 management:
   endpoints:
     web:
@@ -84,4 +146,3 @@ management:
   endpoint:
     health:
       show-details: when-authorized
-  

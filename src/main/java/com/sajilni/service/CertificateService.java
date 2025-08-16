@@ -1,5 +1,6 @@
 package com.sajilni.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +17,10 @@ import java.util.Base64;
 import java.util.logging.Logger;
 import org.springframework.core.io.ClassPathResource;
 import java.nio.charset.StandardCharsets;
-
+@Slf4j
 @Service
 public class CertificateService {
 
-    private static final Logger logger = Logger.getLogger(CertificateService.class.getName());
 
     @Value("${app.security.private-key-path}")
     private String privateKeyPath;
@@ -31,29 +31,29 @@ public class CertificateService {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    @PostConstruct
+    @PostConstruct // tell me about this
     public void initializeKeys() {
         try {
             Path privatePath = resolvePath(privateKeyPath);
             Path publicPath = resolvePath(publicKeyPath);
 
             if (Files.exists(privatePath) && Files.exists(publicPath)) {
-                logger.info("Found existing key pair. Loading from file system.");
+                log.info("Found existing key pair. Loading from file system.");
                 try {
                     loadExistingKeys(privatePath, publicPath);
                 } catch (Exception e) {
-                    logger.warning("Failed to load existing keys: " + e.getMessage() + ". Regenerating...");
+                    log.warn("Failed to load existing keys: " + e.getMessage() + ". Regenerating...");
                     // Delete corrupted files and generate new ones
                     deleteExistingKeys(privatePath, publicPath);
                     generateNewKeyPair(privatePath, publicPath);
                 }
             } else {
-                logger.info("Key pair not found. Generating new key pair.");
+                log.info("Key pair not found. Generating new key pair.");
                 generateNewKeyPair(privatePath, publicPath);
             }
-            logger.info("JWT keys initialized successfully.");
+            log.info("JWT keys initialized successfully.");
         } catch (Exception e) {
-            logger.severe("FATAL: JWT key initialization failed: " + e.getMessage());
+            log.error("FATAL: JWT key initialization failed: " + e.getMessage());
             throw new IllegalStateException("JWT key initialization failed", e);
         }
     }
@@ -93,32 +93,24 @@ public class CertificateService {
         Files.write(privatePath, privateKeyPem.getBytes(StandardCharsets.UTF_8));
         Files.write(publicPath, publicKeyPem.getBytes(StandardCharsets.UTF_8));
 
-        logger.info("New key pair generated and saved to:");
-        logger.info("Private key: " + privatePath.toAbsolutePath());
-        logger.info("Public key: " + publicPath.toAbsolutePath());
+        log.info("New key pair generated and saved to:");
+        log.info("Private key: " + privatePath.toAbsolutePath());
+        log.info("Public key: " + publicPath.toAbsolutePath());
     }
 
     private void deleteExistingKeys(Path privatePath, Path publicPath) {
         try {
             if (Files.exists(privatePath)) {
                 Files.delete(privatePath);
-                logger.info("Deleted corrupted private key file");
+                log.info("Deleted corrupted private key file");
             }
             if (Files.exists(publicPath)) {
                 Files.delete(publicPath);
-                logger.info("Deleted corrupted public key file");
+                log.info("Deleted corrupted public key file");
             }
         } catch (IOException e) {
-            logger.warning("Failed to delete existing key files: " + e.getMessage());
+            log.warn("Failed to delete existing key files: " + e.getMessage());
         }
-    }
-
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
-
-    public PublicKey getPublicKey() {
-        return publicKey;
     }
 
     private Path resolvePath(String pathStr) throws IOException {
